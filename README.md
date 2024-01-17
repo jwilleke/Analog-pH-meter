@@ -11,10 +11,7 @@ This was done in [platformio](https://platformio.org/) in VSCode.
 Typical ouput of src/main.cpp
 
 ''' bash
-temperature:25.0^C  pH:15.45
-temperature:25.0^C  pH:15.42
-temperature:25.0^C  pH:15.42
-temperature:25.0^C  pH:15.45
-temperature:25.0^C  pH:15.42
-
+_neutralVoltage:1500.00
+_acidVoltage:2032.44
+temperature:25.0^C  pH:8.85
 '''
