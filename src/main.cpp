@@ -26,7 +26,7 @@ DFRobot_PH ph;
 void setup()
 {
     Serial.begin(115200);  
-    ph.begin();
+    ph.begin(); // function modified in DFRobit.cpp to stop unnecessary junk from showing in out put and messing up graphs -jwilleke
 }
 
 void loop()
