@@ -15,3 +15,7 @@ _neutralVoltage:1500.00
 _acidVoltage:2032.44
 temperature:25.0^C  pH:8.85
 '''
+
+## Gravity: Analog Electrical Conductivity Sensor /Meter V2 (K=1)
+
+[Gravity: Analog Electrical Conductivity Sensor /Meter V2 (K=1)](https://www.dfrobot.com/product-1123.html)
