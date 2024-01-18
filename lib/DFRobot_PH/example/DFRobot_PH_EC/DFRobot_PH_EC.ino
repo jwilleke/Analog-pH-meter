@@ -22,6 +22,7 @@
  * @url https://github.com/DFRobot/DFRobot_PH
  */
 
+#include "Arduino.h"
 #include "DFRobot_PH.h"
 #include "DFRobot_EC.h"
 #include <EEPROM.h>

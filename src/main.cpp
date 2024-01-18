@@ -1,12 +1,18 @@
 /*!
- * @file DFRobot_PH_Test.h
- * @brief This is the sample code for Gravity: Analog pH Sensor / Meter Kit V2, SKU:SEN0161-V2.
+ * @file DFRobot_PH_EC.h
+ * @brief This is the sample code for The Mixed use of two sensors: 
+ * @n 1. Gravity: Analog pH Sensor / Meter Kit V2, SKU:SEN0161-V2
+ * @n 2. Analog Electrical Conductivity Sensor / Meter Kit V2 (K=1.0), SKU: DFR0300.
  * @n In order to guarantee precision, a temperature sensor such as DS18B20 is needed, to execute automatic temperature compensation.
- * @n You can send commands in the serial monitor to execute the calibration.
  * @n Serial Commands:
+ * @n   PH Calibration：
  * @n    enterph -> enter the calibration mode
  * @n    calph   -> calibrate with the standard buffer solution, two buffer solutions(4.0 and 7.0) will be automaticlly recognized
  * @n    exitph  -> save the calibrated parameters and exit from calibration mode
+ * @n   EC Calibration：
+ * @n    enterph -> enter the PH calibration mode
+ * @n    calph   -> calibrate with the standard buffer solution, two buffer solutions(4.0 and 7.0) will be automaticlly recognized
+ * @n    exitph  -> save the calibrated parameters and exit from PH calibration mode
  *
  * @copyright   Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @license     The MIT License (MIT)
@@ -22,29 +28,63 @@
 #include <EEPROM.h>
 
 #define PH_PIN A1
-float voltage,phValue,temperature = 25;
+#define EC_PIN A2
+float  voltagePH,voltageEC,phValue,ecValue,temperature = 25;
 DFRobot_PH ph;
+DFRobot_EC ec;
 
 void setup()
 {
     Serial.begin(115200);  
-    ph.begin(); // function modified in DFRobit.cpp to stop unnecessary junk from showing in out put and messing up graphs -jwilleke
+    ph.begin();
+    ec.begin();
 }
 
 void loop()
 {
+    char cmd[10];
     static unsigned long timepoint = millis();
-    if(millis()-timepoint>1000U){                  //time interval: 1s
+    if(millis()-timepoint>1000U){                            //time interval: 1s
         timepoint = millis();
-        //temperature = readTemperature();         // read your temperature sensor to execute temperature compensation
-        voltage = analogRead(PH_PIN)/1024.0*5000;  // read the voltage
-        phValue = ph.readPH(voltage,temperature);  // convert voltage to pH with temperature compensation
-        Serial.print("temperature:");
-        Serial.print(temperature,1);
-        Serial.print("^C  pH:");
-        Serial.println(phValue,2);
+        //temperature = readTemperature();                   // read your temperature sensor to execute temperature compensation
+        voltagePH = analogRead(PH_PIN)/1024.0*5000;          // read the ph voltage
+        phValue    = ph.readPH(voltagePH,temperature);       // convert voltage to pH with temperature compensation
+        Serial.print("pH:");
+        Serial.print(phValue,2);
+        voltageEC = analogRead(EC_PIN)/1024.0*5000;
+        ecValue    = ec.readEC(voltageEC,temperature);       // convert voltage to EC with temperature compensation
+        Serial.print(", EC:");
+        Serial.print(ecValue,2);
+        Serial.println("ms/cm");
     }
-    ph.calibration(voltage,temperature);           // calibration process by Serail CMD
+    if(readSerial(cmd)){
+        strupr(cmd);
+        if(strstr(cmd,"PH")){
+            ph.calibration(voltagePH,temperature,cmd);       //PH calibration process by Serail CMD
+        }
+        if(strstr(cmd,"EC")){
+            ec.calibration(voltageEC,temperature,cmd);       //EC calibration process by Serail CMD
+        }
+    }
+}
+
+int i = 0;
+bool readSerial(char result[]){
+    while(Serial.available() > 0){
+        char inChar = Serial.read();
+        if(inChar == '\n'){
+             result[i] = '\0';
+             Serial.flush();
+             i=0;
+             return true;
+        }
+        if(inChar != '\r'){
+             result[i] = inChar;
+             i++;
+        }
+        delay(1);
+    }
+    return false;
 }
 
 float readTemperature()
